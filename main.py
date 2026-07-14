@@ -43,4 +43,4 @@ app.include_router(JWT.router)
 
 @app.get("/test")
 async def root():
-    return {'status': 'ok', 'database': 'ok'}
+    return {'status': 'ok', 'database': 'ok', 'routers': 'ok'}
