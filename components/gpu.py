@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter,Depends
 from db import get_db_cursor
 
 router = APIRouter(
@@ -7,8 +7,12 @@ router = APIRouter(
 )
 
 @router.get("/")
-async def get_all_gpu (cur = Depends(get_db_cursor)):
-    await cur.execute("select * from gpu")
+async def get_all_gpu (chip: str = None, cur = Depends(get_db_cursor)):
+    if chip:
+        query = "SELECT * FROM gpu WHERE chip_prod = %s"
+        await cur.execute(query, (chip))
+    else:
+        await cur.execute("select * from gpu")
     gpus = await cur.fetchall()
 
     return {

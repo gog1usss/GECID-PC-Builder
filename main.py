@@ -3,7 +3,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import aiomysql
 from db import DB_config
-from components import cpu,gpu,motherboard, cases, coolers
+from components import cpu, gpu, motherboard, cases, coolers, ram, psu, anlz, RPC
+import JWT
+
 
 @asynccontextmanager
 async def lifespan (app:FastAPI):
@@ -31,6 +33,12 @@ app.include_router(gpu.router)
 app.include_router(motherboard.router)
 app.include_router(cases.router)
 app.include_router(coolers.router)
+app.include_router(ram.router)
+app.include_router(psu.router)
+app.include_router(RPC.router)
+app.include_router(anlz.router)
+app.include_router(JWT.router)
+
 
 
 @app.get("/test")

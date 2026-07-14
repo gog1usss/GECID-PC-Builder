@@ -3,7 +3,7 @@ from db import get_db_cursor
 
 router = APIRouter(
     prefix='/api/v1/coolers',
-    tags = ['Coolong']
+    tags = ['Cooling']
 )
 
 @router.get('/')
@@ -29,3 +29,4 @@ async def get_all_routers(cpu_id: int = None, cur = Depends(get_db_cursor)):
         'count': len(coolers),
         'data': coolers
     }
+
