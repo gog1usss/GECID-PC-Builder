@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from typing import Optional
-from db import get_db_cursor
-from JWT import get_user
+from Database.db import get_db_cursor
+from core.JWT import get_user
 
 
 router = APIRouter(

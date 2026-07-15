@@ -1,5 +1,5 @@
 from fastapi import APIRouter,Depends
-from db import get_db_cursor
+from Database.db import get_db_cursor
 
 router = APIRouter(
     prefix='/api/v1/gpu',

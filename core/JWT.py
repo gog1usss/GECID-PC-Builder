@@ -4,8 +4,8 @@ from pydantic import BaseModel
 from passlib.context import CryptContext
 import jwt
 from datetime import datetime, timedelta
-from db import get_db_cursor
-from values import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from Database.db import get_db_cursor
+from core.values import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 from typing import Optional
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

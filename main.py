@@ -2,9 +2,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import aiomysql
-from db import DB_config
+from Database.db import DB_config
 from components import cpu, gpu, motherboard, cases, coolers, ram, psu, anlz, RPC
-import JWT
+import core.JWT as JWT
 
 
 @asynccontextmanager

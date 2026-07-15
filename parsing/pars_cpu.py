@@ -4,7 +4,7 @@ import re
 import pymysql
 import time
 
-from values import DB_config
+from core.values import DB_config
 
 CATALOG_URL = 'https://telemart.ua/ua/city-1252/case/'
 CSS_CARD = '.product-item'
