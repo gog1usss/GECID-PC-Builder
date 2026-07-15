@@ -1,49 +1,43 @@
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import requests
 from bs4 import BeautifulSoup
 import re
 import pymysql
 import time
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.values import DB_config
 
-CATALOG_URL = 'https://telemart.ua/ua/city-1252/processor/'
+CATALOG_URL = 'https://telemart.ua/ua/city-1252/case/'
 CSS_CARD = '.product-item'
 CSS_TITLE = '.product-item__title'
 CSS_PRICE = '.product-cost'
 CSS_IMG = '.product-item__pic img'
 PAGES_TO_PARSE = 5
 
-def cpu_specs(full_name):
+def case_specs(full_name):
     name_upper = full_name.upper()
+    brand_case = 'Unknown'
+    vendors = ['DEEPCOOL', 'NZXT', 'FRACTAL DESIGN', 'BE QUIET!', 'CORSAIR', 'MSI', 'ASUS', 'LIAN LI', 'AEROCOOL', 'HEXO', 'SAMA','THERMALRIGHT', 'APNX', 'GAMEMAX', 'COUGAR', '1STPLAYER',
+               'PCCOOLER']
+    
+    for v in vendors:
+        if v in name_upper:
+            if v == 'BE QUIET!': brand_case = 'be quiet!'
+            elif v == 'FRACTAL DESIGN': brand_case = 'Fractal Design'
+            elif v == 'LIAN LI': brand_case = 'Lian Li'
+            else: brand_case = v.capitalize()
+            if brand_case == 'Msi': brand_case = 'MSI'
+            if brand_case == 'Asus': brand_case = 'ASUS'
+            if brand_case == 'Nzxt': brand_case = 'NZXT'
+            break
 
-    brand = 'Unknown'
-    if 'AMD' in name_upper: brand = 'AMD'
-    elif 'INTEL' in name_upper: brand = 'Intel'
+    clean_name = full_name.replace("Корпус", "").strip()
+    max_gpu = 350 
 
-    socket = 'Unknown'
-    if 'AM5' in name_upper: socket = 'AM5'
-    elif 'AM4' in name_upper: socket = 'AM4'
-    elif '1700' in name_upper: socket = 'LGA1700'
-    elif '1200' in name_upper: socket = 'LGA1200'
-    elif '1151' in name_upper: socket = 'LGA1151'
-    elif '1155' in name_upper: socket = 'LGA1155'
-    elif '1851' in name_upper: socket = 'LGA1851'
-
-    tdp = 65 
-    if 'I9' in name_upper or 'RYZEN 9' in name_upper or 'ULTRA 9' in name_upper: tdp = 170
-    elif 'I7' in name_upper or 'RYZEN 7' in name_upper or 'ULTRA 7' in name_upper: tdp = 120
-    elif 'I5' in name_upper or 'RYZEN 5' in name_upper or 'ULTRA 5' in name_upper:
-        tdp = 105 if ' X' in name_upper or 'K ' in name_upper or 'KF ' in name_upper else 65
-
-    clean_name = full_name.replace("Процесор", "").replace("Процессор", "").strip()
-    clean_name = re.split(r'\s+\d+\.\d+', clean_name)[0]
-    clean_name = re.split(r'\s+(Box|Tray|OEM)', clean_name, flags=re.IGNORECASE)[0]
-    clean_name = clean_name.strip()
-
-    return brand, clean_name, socket, tdp
+    return brand_case, clean_name, max_gpu
 
 def parse_catalog_page(url):
     headers = {
@@ -85,16 +79,13 @@ def parse_catalog_page(url):
                 if img_elem:
                     image_url = img_elem.get('src') or img_elem.get('data-src') or ''
 
-                brand, clean_name, socket, estimated_tdp = cpu_specs(raw_name)
-
-                if socket == 'Unknown': continue
+                brand_case, clean_name, max_gpu = case_specs(raw_name)
 
                 parsed_items.append(
                     {
-                        'brand': brand,
+                        'brand_case': brand_case,
                         'name': clean_name,
-                        'socket': socket,
-                        'tdp': estimated_tdp,
+                        'max_gpu': max_gpu,
                         'price': price,
                         'review_url': link,
                         'image_url': image_url
@@ -115,18 +106,18 @@ def save_items_db(items):
         with connection.cursor() as cur:
             for item in items:
                 sql_string = '''
-                                INSERT IGNORE INTO cpu (brand_cpu, name_cpu, socket_cpu, tdp, price, review_url, image_url) 
-                                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                                INSERT IGNORE INTO cases (brand_case, name_case, max_gpu_length_mm, price, review_url, image_url) 
+                                VALUES (%s, %s, %s, %s, %s, %s)
                             '''
                 cur.execute(sql_string, (
-                    item['brand'], item['name'], item['socket'],
-                    item['tdp'], item['price'], item['review_url'], item['image_url']
+                    item['brand_case'], item['name'], item['max_gpu'],
+                    item['price'], item['review_url'], item['image_url']
                 ))
 
                 if cur.rowcount > 0:
                     inserted_count += 1
         connection.commit()
-        print(f"CPUs been added: {inserted_count}")
+        print(f"Cases been added: {inserted_count}")
     except pymysql.MySQLError as e:
         print(f"Error in db {e}")
     finally:
@@ -134,7 +125,7 @@ def save_items_db(items):
             connection.close()
 
 if __name__ == "__main__":
-    print(f"Push (Pages: {PAGES_TO_PARSE}) \n")
+    print(f"Push (Pages: {PAGES_TO_PARSE})\n")
     all_gathered_items = []
 
     for page_num in range(1, PAGES_TO_PARSE + 1):
@@ -148,5 +139,5 @@ if __name__ == "__main__":
         time.sleep(3)
 
     if all_gathered_items:
-        print(f"CPUs found: {len(all_gathered_items)}")
+        print(f"Cases found: {len(all_gathered_items)}")
         save_items_db(all_gathered_items)

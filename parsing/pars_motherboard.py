@@ -3,47 +3,52 @@ from bs4 import BeautifulSoup
 import re
 import pymysql
 import time
+from core.values import DB_config
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.values import DB_config
-
-CATALOG_URL = 'https://telemart.ua/ua/city-1252/processor/'
+CATALOG_URL = 'https://telemart.ua/ua/city-1252/motherboard/'
 CSS_CARD = '.product-item'
 CSS_TITLE = '.product-item__title'
 CSS_PRICE = '.product-cost'
 CSS_IMG = '.product-item__pic img'
 PAGES_TO_PARSE = 5
 
-def cpu_specs(full_name):
+def mb_specs(full_name):
     name_upper = full_name.upper()
 
-    brand = 'Unknown'
-    if 'AMD' in name_upper: brand = 'AMD'
-    elif 'INTEL' in name_upper: brand = 'Intel'
+    brand_mother = 'Unknown'
+    vendors = ['ASUS', 'MSI', 'GIGABYTE', 'ASROCK', 'BIOSTAR', 'NZXT']
+    for v in vendors:
+        if v in name_upper:
+            brand_mother = 'ASRock' if v == 'ASROCK' else v.capitalize()
+            if brand_mother == 'Asus': brand_mother = 'ASUS'
+            if brand_mother == 'Msi': brand_mother = 'MSI'
+            if brand_mother == 'Nzxt': brand_mother = 'NZXT'
+            break
 
-    socket = 'Unknown'
-    if 'AM5' in name_upper: socket = 'AM5'
-    elif 'AM4' in name_upper: socket = 'AM4'
-    elif '1700' in name_upper: socket = 'LGA1700'
-    elif '1200' in name_upper: socket = 'LGA1200'
-    elif '1151' in name_upper: socket = 'LGA1151'
-    elif '1155' in name_upper: socket = 'LGA1155'
-    elif '1851' in name_upper: socket = 'LGA1851'
+    socket_mother = 'Unknown'
+    if 'AM5' in name_upper: socket_mother = 'AM5'
+    elif 'AM4' in name_upper: socket_mother = 'AM4'
+    elif '1700' in name_upper: socket_mother = 'LGA1700'
+    elif '1200' in name_upper: socket_mother = 'LGA1200'
+    elif '1151' in name_upper: socket_mother = 'LGA1151'
 
-    tdp = 65 
-    if 'I9' in name_upper or 'RYZEN 9' in name_upper or 'ULTRA 9' in name_upper: tdp = 170
-    elif 'I7' in name_upper or 'RYZEN 7' in name_upper or 'ULTRA 7' in name_upper: tdp = 120
-    elif 'I5' in name_upper or 'RYZEN 5' in name_upper or 'ULTRA 5' in name_upper:
-        tdp = 105 if ' X' in name_upper or 'K ' in name_upper or 'KF ' in name_upper else 65
+    form_factor = 'ATX'
+    if 'MICRO' in name_upper or 'MATX' in name_upper or 'M-ATX' in name_upper: 
+        form_factor = 'Micro-ATX'
+    elif 'MINI' in name_upper or 'ITX' in name_upper: 
+        form_factor = 'Mini-ITX'
+    elif 'E-ATX' in name_upper or 'EATX' in name_upper: 
+        form_factor = 'E-ATX'
 
-    clean_name = full_name.replace("Процесор", "").replace("Процессор", "").strip()
-    clean_name = re.split(r'\s+\d+\.\d+', clean_name)[0]
-    clean_name = re.split(r'\s+(Box|Tray|OEM)', clean_name, flags=re.IGNORECASE)[0]
-    clean_name = clean_name.strip()
+    ram_type = 'DDR5' if 'DDR5' in name_upper else 'DDR4'
 
-    return brand, clean_name, socket, tdp
+    clean_name = full_name.replace("Материнська плата", "").replace("Материнская плата", "").strip()
+    clean_name = clean_name.split(' (')[0].strip()
+
+    return brand_mother, clean_name, socket_mother, form_factor, ram_type
 
 def parse_catalog_page(url):
     headers = {
@@ -85,16 +90,17 @@ def parse_catalog_page(url):
                 if img_elem:
                     image_url = img_elem.get('src') or img_elem.get('data-src') or ''
 
-                brand, clean_name, socket, estimated_tdp = cpu_specs(raw_name)
+                brand_mother, clean_name, socket_mother, form_factor, ram_type = mb_specs(raw_name)
 
-                if socket == 'Unknown': continue
+                if socket_mother == 'Unknown': continue
 
                 parsed_items.append(
                     {
-                        'brand': brand,
+                        'brand_mother': brand_mother,
                         'name': clean_name,
-                        'socket': socket,
-                        'tdp': estimated_tdp,
+                        'socket_mother': socket_mother,
+                        'form_factor': form_factor,
+                        'ram_type': ram_type,
                         'price': price,
                         'review_url': link,
                         'image_url': image_url
@@ -115,18 +121,19 @@ def save_items_db(items):
         with connection.cursor() as cur:
             for item in items:
                 sql_string = '''
-                                INSERT IGNORE INTO cpu (brand_cpu, name_cpu, socket_cpu, tdp, price, review_url, image_url) 
-                                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                                INSERT IGNORE INTO motherboard (brand_mother, name_mother, socket_mother, form_factor, ram_type, price_mother, review_url, image_url) 
+                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                             '''
                 cur.execute(sql_string, (
-                    item['brand'], item['name'], item['socket'],
-                    item['tdp'], item['price'], item['review_url'], item['image_url']
+                    item['brand_mother'], item['name'], item['socket_mother'],
+                    item['form_factor'], item['ram_type'], item['price'], 
+                    item['review_url'], item['image_url']
                 ))
 
                 if cur.rowcount > 0:
                     inserted_count += 1
         connection.commit()
-        print(f"CPUs been added: {inserted_count}")
+        print(f"Motherboards been added: {inserted_count}")
     except pymysql.MySQLError as e:
         print(f"Error in db {e}")
     finally:
@@ -148,5 +155,5 @@ if __name__ == "__main__":
         time.sleep(3)
 
     if all_gathered_items:
-        print(f"CPUs found: {len(all_gathered_items)}")
+        print(f"Motherboards found: {len(all_gathered_items)}")
         save_items_db(all_gathered_items)

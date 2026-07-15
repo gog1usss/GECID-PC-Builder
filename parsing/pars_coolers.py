@@ -1,49 +1,50 @@
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import requests
 from bs4 import BeautifulSoup
 import re
 import pymysql
 import time
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.values import DB_config
 
-CATALOG_URL = 'https://telemart.ua/ua/city-1252/processor/'
+CATALOG_URLS = [
+    'https://telemart.ua/ua/city-1252/sistemy-oxlazhdenija/',
+    'https://telemart.ua/ua/city-1252/readysetsofcbo/'
+]
 CSS_CARD = '.product-item'
 CSS_TITLE = '.product-item__title'
 CSS_PRICE = '.product-cost'
 CSS_IMG = '.product-item__pic img'
 PAGES_TO_PARSE = 5
 
-def cpu_specs(full_name):
+def cooler_specs(full_name):
     name_upper = full_name.upper()
+    brand_cooler = 'Unknown'
+    vendors = ['DEEPCOOL', 'BE QUIET!', 'NOCTUA', 'ARCTIC', 'ID-COOLING', 'ZALMAN', 'NZXT', 'JONSBO', 'THERMALRIGHT', 'ASUS', 'MSI', 'SAMA', 'GAMEMAX', 'LIAN-LI','TRYX PANORAMA']
+    for v in vendors:
+        if v in name_upper:
+            if v == 'BE QUIET!': brand_cooler = 'be quiet!'
+            elif v == 'ID-COOLING': brand_cooler = 'ID-Cooling'
+            else: brand_cooler = v.capitalize()
+            if brand_cooler == 'Nzxt': brand_cooler = 'NZXT'
+            if brand_cooler == 'Msi': brand_cooler = 'MSI'
+            if brand_cooler == 'Asus': brand_cooler = 'ASUS'
+            break
 
-    brand = 'Unknown'
-    if 'AMD' in name_upper: brand = 'AMD'
-    elif 'INTEL' in name_upper: brand = 'Intel'
+    tdp = 150
+    match = re.search(r'(\d{2,3})\s*(?:W|Вт|WATT)', name_upper)
+    if match:
+        tdp = int(match.group(1))
+    elif 'ВОДЯНА' in name_upper or 'ВОДЯНАЯ' in name_upper or 'LIQUID' in name_upper or 'СЖО' in name_upper:
+        tdp = 250
 
-    socket = 'Unknown'
-    if 'AM5' in name_upper: socket = 'AM5'
-    elif 'AM4' in name_upper: socket = 'AM4'
-    elif '1700' in name_upper: socket = 'LGA1700'
-    elif '1200' in name_upper: socket = 'LGA1200'
-    elif '1151' in name_upper: socket = 'LGA1151'
-    elif '1155' in name_upper: socket = 'LGA1155'
-    elif '1851' in name_upper: socket = 'LGA1851'
+    clean_name = full_name.replace("Кулер для процесора", "").replace("Кулер", "").replace("Система рідинного охолодження", "").strip()
+    clean_name = clean_name.split(' (')[0].strip()
 
-    tdp = 65 
-    if 'I9' in name_upper or 'RYZEN 9' in name_upper or 'ULTRA 9' in name_upper: tdp = 170
-    elif 'I7' in name_upper or 'RYZEN 7' in name_upper or 'ULTRA 7' in name_upper: tdp = 120
-    elif 'I5' in name_upper or 'RYZEN 5' in name_upper or 'ULTRA 5' in name_upper:
-        tdp = 105 if ' X' in name_upper or 'K ' in name_upper or 'KF ' in name_upper else 65
-
-    clean_name = full_name.replace("Процесор", "").replace("Процессор", "").strip()
-    clean_name = re.split(r'\s+\d+\.\d+', clean_name)[0]
-    clean_name = re.split(r'\s+(Box|Tray|OEM)', clean_name, flags=re.IGNORECASE)[0]
-    clean_name = clean_name.strip()
-
-    return brand, clean_name, socket, tdp
+    return brand_cooler, clean_name, tdp
 
 def parse_catalog_page(url):
     headers = {
@@ -85,16 +86,13 @@ def parse_catalog_page(url):
                 if img_elem:
                     image_url = img_elem.get('src') or img_elem.get('data-src') or ''
 
-                brand, clean_name, socket, estimated_tdp = cpu_specs(raw_name)
-
-                if socket == 'Unknown': continue
+                brand_cooler, clean_name, max_tdp = cooler_specs(raw_name)
 
                 parsed_items.append(
                     {
-                        'brand': brand,
+                        'brand_cooler': brand_cooler,
                         'name': clean_name,
-                        'socket': socket,
-                        'tdp': estimated_tdp,
+                        'max_tdp': max_tdp,
                         'price': price,
                         'review_url': link,
                         'image_url': image_url
@@ -115,18 +113,18 @@ def save_items_db(items):
         with connection.cursor() as cur:
             for item in items:
                 sql_string = '''
-                                INSERT IGNORE INTO cpu (brand_cpu, name_cpu, socket_cpu, tdp, price, review_url, image_url) 
-                                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                                INSERT IGNORE INTO cooler (brand_cooler, name_cooler, max_tdp, price, review_url, image_url) 
+                                VALUES (%s, %s, %s, %s, %s, %s)
                             '''
                 cur.execute(sql_string, (
-                    item['brand'], item['name'], item['socket'],
-                    item['tdp'], item['price'], item['review_url'], item['image_url']
+                    item['brand_cooler'], item['name'], item['max_tdp'],
+                    item['price'], item['review_url'], item['image_url']
                 ))
 
                 if cur.rowcount > 0:
                     inserted_count += 1
         connection.commit()
-        print(f"CPUs been added: {inserted_count}")
+        print(f"Coolers been added: {inserted_count}")
     except pymysql.MySQLError as e:
         print(f"Error in db {e}")
     finally:
@@ -134,19 +132,21 @@ def save_items_db(items):
             connection.close()
 
 if __name__ == "__main__":
-    print(f"Push (Pages: {PAGES_TO_PARSE}) \n")
+    print(f"Push (Pages: {PAGES_TO_PARSE} per category) 🚀\n")
     all_gathered_items = []
 
-    for page_num in range(1, PAGES_TO_PARSE + 1):
-        page_url = f"{CATALOG_URL}?page={page_num}"
-        items_from_page = parse_catalog_page(page_url)
+    for base_url in CATALOG_URLS:
+        print(f"\nCat_scan: {base_url} ---")
+        for page_num in range(1, PAGES_TO_PARSE + 1):
+            page_url = f"{base_url}?page={page_num}"
+            items_from_page = parse_catalog_page(page_url)
 
-        if not items_from_page: break
-        all_gathered_items.extend(items_from_page)
+            if not items_from_page: break
+            all_gathered_items.extend(items_from_page)
 
-        print("3sec...\n")
-        time.sleep(3)
+            print("3sec...\n")
+            time.sleep(3)
 
     if all_gathered_items:
-        print(f"CPUs found: {len(all_gathered_items)}")
+        print(f"\nCoolers found: {len(all_gathered_items)}")
         save_items_db(all_gathered_items)
