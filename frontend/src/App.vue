@@ -115,8 +115,7 @@
               </div>
             </div>
             <select v-model="selected.gpu" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all bg-white">
-              <option :value="null">-- Выберите видеокарту (Опционально) --</option>
-              <option v-for="item in filteredOptions.gpus" :key="item.id" :value="item">
+              <option :value="null">-- Выберите видеокарту --</option>
                 {{ getField(item, 'gpu', 'name') }} — {{ getField(item, 'gpu', 'price') }} ₴
               </option>
             </select>
