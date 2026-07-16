@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import aiomysql
+from fastapi.middleware.cors import CORSMiddleware 
 from Database.db import DB_config
 from components import cpu, gpu, motherboard, cases, coolers, ram, psu, anlz, RPC
 import core.JWT as JWT
@@ -15,14 +16,14 @@ async def lifespan (app:FastAPI):
     yield
 
     app.state.db_pool.close()
-    await app.state.db_pool.wait.closed()
+    await app.state.db_pool.wait_closed()
     print("Connection broke")
 
 app = FastAPI(lifespan=lifespan, title="GECID PC Builder")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=["*"],    
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
