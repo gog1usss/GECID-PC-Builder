@@ -11,7 +11,7 @@ async def get_cases(mother_id: int = None, cur = Depends(get_db_cursor)):
 
     if mother_id:
         query = '''
-        select c.brand_case, c.name_case, cf.form_factor, c.price, m.brand_mother, m.name_mother, m.price_mother from cases c 
+        select c.brand_case, c.name_case, cf.form_factor, c.price, c.image_url m.brand_mother, m.name_mother, m.price_mother from cases c 
         Join cases_form cf ON (c.id = cf.case_id)
         join motherboard m ON (cf.form_factor = m.form_factor)
         where m.id = %s   
