@@ -23,7 +23,8 @@ PAGES_TO_PARSE = 5
 def cooler_specs(full_name):
     name_upper = full_name.upper()
     brand_cooler = 'Unknown'
-    vendors = ['DEEPCOOL', 'BE QUIET!', 'NOCTUA', 'ARCTIC', 'ID-COOLING', 'ZALMAN', 'NZXT', 'JONSBO', 'THERMALRIGHT', 'ASUS', 'MSI', 'SAMA', 'GAMEMAX', 'LIAN-LI','TRYX PANORAMA']
+    vendors = ['DEEPCOOL', 'BE QUIET!', 'NOCTUA', 'ARCTIC', 'ID-COOLING', 'ZALMAN', 'NZXT', 'JONSBO', 'THERMALRIGHT', 'ASUS', 'MSI', 'SAMA', 'GAMEMAX', 'LIAN-LI','TRYX PANORAMA',
+               'HEXO', 'APNX', 'QUBE', 'Ice Butterfly', 'Corsair']
     for v in vendors:
         if v in name_upper:
             if v == 'BE QUIET!': brand_cooler = 'be quiet!'

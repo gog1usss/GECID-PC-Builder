@@ -18,6 +18,6 @@ async def get_all_gpu (chip: str = None, cur = Depends(get_db_cursor)):
     return {
         'status': 'ok',
         'items': len(gpus),
-        'values': gpus
+        'data': gpus
     }
 

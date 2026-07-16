@@ -14,5 +14,5 @@ async def get_all_processors(cur = Depends(get_db_cursor)):
     return {
         'status': 'ok',
         'processors found': len(processors),
-        'data found': processors
+        'data': processors
     }
