@@ -3,31 +3,40 @@
     <header class="bg-blue-600 text-white p-4 shadow-lg sticky top-0 z-50">
       <div class="container mx-auto max-w-6xl flex justify-between items-center">
         <!-- Кликабельный логотип -->
-        <h1 @click="currentView = 'builder'" class="text-2xl font-bold flex items-center gap-2 cursor-pointer hover:text-slate-200 transition-colors" title="На главную">
+        <h1 @click="currentView = 'builder'" class="text-2xl font-bold flex items-center gap-2 cursor-pointer hover:text-slate-200 transition-colors" :title="$t('header.logoTitle')">
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
           GECID PC Builder
         </h1>
         
         <div class="flex items-center gap-4">
+          <!-- Переключатель языков -->
+          <div class="flex items-center gap-2 bg-blue-800/50 px-3 py-1.5 rounded-full">
+            <button @click="changeLanguage('uk')" :class="{'text-white font-bold': locale === 'uk', 'text-blue-300': locale !== 'uk'}" class="text-xs hover:text-white transition-colors uppercase tracking-wider">UK</button>
+            <span class="text-blue-400 text-xs opacity-50">|</span>
+            <button @click="changeLanguage('en')" :class="{'text-white font-bold': locale === 'en', 'text-blue-300': locale !== 'en'}" class="text-xs hover:text-white transition-colors uppercase tracking-wider">EN</button>
+            <span class="text-blue-400 text-xs opacity-50">|</span>
+            <button @click="changeLanguage('ru')" :class="{'text-white font-bold': locale === 'ru', 'text-blue-300': locale !== 'ru'}" class="text-xs hover:text-white transition-colors uppercase tracking-wider">RU</button>
+          </div>
+
           <div class="text-sm font-medium bg-blue-700 px-3 py-1 rounded-full hidden sm:block">Vue.js Edition</div>
           
           <template v-if="auth.isAuthenticated">
-            <span class="font-medium text-sm text-blue-200">Привет, {{ auth.username }}!</span>
+            <span class="font-medium text-sm text-blue-200">{{ $t('header.greeting') }}, {{ auth.username }}!</span>
             
             <button v-if="currentView !== 'builder'" @click="currentView = 'builder'" class="text-sm bg-blue-700 hover:bg-blue-800 px-3 py-1 rounded transition-colors font-semibold shadow-sm">
-              Конструктор
+              {{ $t('header.builderBtn') }}
             </button>
             <button v-if="currentView !== 'profile'" @click="openProfile" class="text-sm bg-emerald-500 hover:bg-emerald-600 px-3 py-1 rounded transition-colors font-semibold shadow-sm">
-              Мой профиль
+              {{ $t('header.profileBtn') }}
             </button>
             
             <button @click="logout" class="text-sm bg-red-500 hover:bg-red-600 px-3 py-1 rounded transition-colors font-semibold shadow-sm">
-              Выйти
+              {{ $t('header.logoutBtn') }}
             </button>
           </template>
           <template v-else>
             <button @click="showAuthModal = true" class="text-sm bg-white text-blue-600 hover:bg-blue-50 px-4 py-1.5 rounded transition-colors font-bold shadow-sm">
-              Войти
+              {{ $t('header.loginBtn') }}
             </button>
           </template>
         </div>
@@ -41,22 +50,22 @@
         
         <div class="lg:col-span-2 space-y-6">
           <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <h2 class="text-xl font-bold mb-6 border-b pb-3 text-slate-800">Шаг 1: Основа системы</h2>
+            <h2 class="text-xl font-bold mb-6 border-b pb-3 text-slate-800">{{ $t('builder.step1_title') }}</h2>
             
             <div class="mb-5">
               <div class="flex justify-between items-center mb-1.5">
-                <label class="text-sm font-semibold text-slate-700">Процессор (CPU)</label>
+                <label class="text-sm font-semibold text-slate-700">{{ $t('builder.labels.cpu') }}</label>
                 <div class="flex gap-2">
                   <select v-model="filters.cpu.brand" class="px-2 py-1 border border-slate-300 rounded text-xs w-28 outline-none focus:ring-1 focus:ring-blue-500 bg-white">
-                    <option value="">Все бренды</option>
+                    <option value="">{{ $t('builder.filters.allBrands') }}</option>
                     <option v-for="brand in availableBrands.cpu" :key="brand" :value="brand">{{ brand }}</option>
                   </select>
-                  <input v-model.number="filters.cpu.minPrice" type="number" placeholder="Мин. ₴" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
-                  <input v-model.number="filters.cpu.maxPrice" type="number" placeholder="Макс. ₴" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
+                  <input v-model.number="filters.cpu.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
+                  <input v-model.number="filters.cpu.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
                 </div>
               </div>
               <select v-model="selected.cpu" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all bg-white">
-                <option :value="null">-- Выберите процессор --</option>
+                <option :value="null">{{ $t('builder.placeholders.selectCpu') }}</option>
                 <option v-for="item in filteredOptions.cpus" :key="item.id" :value="item">
                   {{ getField(item, 'cpu', 'name') }} ({{ item.socket_cpu }}) — {{ getField(item, 'cpu', 'price') }} ₴
                 </option>
@@ -65,39 +74,39 @@
 
             <div class="mb-5">
               <div class="flex justify-between items-center mb-1.5">
-                <label class="text-sm font-semibold text-slate-700">Материнская плата (Motherboard)</label>
+                <label class="text-sm font-semibold text-slate-700">{{ $t('builder.labels.mb') }}</label>
                 <div v-if="selected.cpu" class="flex gap-2">
                   <select v-model="filters.mb.brand" class="px-2 py-1 border border-slate-300 rounded text-xs w-28 outline-none focus:ring-1 focus:ring-blue-500 bg-white">
-                    <option value="">Все бренды</option>
+                    <option value="">{{ $t('builder.filters.allBrands') }}</option>
                     <option v-for="brand in availableBrands.mb" :key="brand" :value="brand">{{ brand }}</option>
                   </select>
-                  <input v-model.number="filters.mb.minPrice" type="number" placeholder="Мин. ₴" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
-                  <input v-model.number="filters.mb.maxPrice" type="number" placeholder="Макс. ₴" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
+                  <input v-model.number="filters.mb.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
+                  <input v-model.number="filters.mb.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
                 </div>
               </div>
               <select v-model="selected.mb" :disabled="!selected.cpu" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:bg-slate-100 disabled:opacity-70 bg-white">
-                <option :value="null">{{ selected.cpu ? '-- Выберите материнскую плату --' : 'Сначала выберите процессор' }}</option>
+                <option :value="null">{{ selected.cpu ? $t('builder.placeholders.selectMb') : $t('builder.placeholders.needCpuFirst') }}</option>
                 <option v-for="item in filteredOptions.mbs" :key="item.id" :value="item">
                   {{ getField(item, 'mb', 'name') }} ({{ item.ram_type }}) — {{ getField(item, 'mb', 'price') }} ₴
                 </option>
               </select>
-              <p class="text-xs text-slate-500 mt-1">Отображаются только платы с подходящим сокетом</p>
+              <p class="text-xs text-slate-500 mt-1">{{ $t('builder.hints.mbHint') }}</p>
             </div>
 
             <div class="mb-2">
               <div class="flex justify-between items-center mb-1.5">
-                <label class="text-sm font-semibold text-slate-700">Охлаждение (Cooler)</label>
+                <label class="text-sm font-semibold text-slate-700">{{ $t('builder.labels.cooler') }}</label>
                 <div v-if="selected.cpu" class="flex gap-2">
                   <select v-model="filters.cooler.brand" class="px-2 py-1 border border-slate-300 rounded text-xs w-28 outline-none focus:ring-1 focus:ring-blue-500 bg-white">
-                    <option value="">Все бренды</option>
+                    <option value="">{{ $t('builder.filters.allBrands') }}</option>
                     <option v-for="brand in availableBrands.cooler" :key="brand" :value="brand">{{ brand }}</option>
                   </select>
-                  <input v-model.number="filters.cooler.minPrice" type="number" placeholder="Мин. ₴" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
-                  <input v-model.number="filters.cooler.maxPrice" type="number" placeholder="Макс. ₴" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
+                  <input v-model.number="filters.cooler.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
+                  <input v-model.number="filters.cooler.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
                 </div>
               </div>
               <select v-model="selected.cooler" :disabled="!selected.cpu" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:bg-slate-100 disabled:opacity-70 bg-white">
-                <option :value="null">{{ selected.cpu ? '-- Выберите охлаждение --' : 'Сначала выберите процессор' }}</option>
+                <option :value="null">{{ selected.cpu ? $t('builder.placeholders.selectCooler') : $t('builder.placeholders.needCpuFirst') }}</option>
                 <option v-for="item in filteredOptions.coolers" :key="item.id" :value="item">
                   {{ getField(item, 'cooler', 'name') }} (TDP: {{ item.max_tdp }}W) — {{ getField(item, 'cooler', 'price') }} ₴
                 </option>
@@ -106,22 +115,22 @@
           </div>
 
           <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <h2 class="text-xl font-bold mb-6 border-b pb-3 text-slate-800">Шаг 2: Память и Видео</h2>
+            <h2 class="text-xl font-bold mb-6 border-b pb-3 text-slate-800">{{ $t('builder.step2_title') }}</h2>
             
             <div class="mb-5">
               <div class="flex justify-between items-center mb-1.5">
-                <label class="text-sm font-semibold text-slate-700">Оперативная память (RAM)</label>
+                <label class="text-sm font-semibold text-slate-700">{{ $t('builder.labels.ram') }}</label>
                 <div v-if="selected.mb" class="flex gap-2">
                   <select v-model="filters.ram.brand" class="px-2 py-1 border border-slate-300 rounded text-xs w-28 outline-none focus:ring-1 focus:ring-blue-500 bg-white">
-                    <option value="">Все бренды</option>
+                    <option value="">{{ $t('builder.filters.allBrands') }}</option>
                     <option v-for="brand in availableBrands.ram" :key="brand" :value="brand">{{ brand }}</option>
                   </select>
-                  <input v-model.number="filters.ram.minPrice" type="number" placeholder="Мин. ₴" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
-                  <input v-model.number="filters.ram.maxPrice" type="number" placeholder="Макс. ₴" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
+                  <input v-model.number="filters.ram.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
+                  <input v-model.number="filters.ram.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
                 </div>
               </div>
               <select v-model="selected.ram" :disabled="!selected.mb" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:bg-slate-100 disabled:opacity-70 bg-white">
-                <option :value="null">{{ selected.mb ? '-- Выберите оперативную память --' : 'Сначала выберите материнскую плату' }}</option>
+                <option :value="null">{{ selected.mb ? $t('builder.placeholders.selectRam') : $t('builder.placeholders.needMbFirst') }}</option>
                 <option v-for="item in filteredOptions.rams" :key="item.id" :value="item">
                   {{ getField(item, 'ram', 'name') }} ({{ item.frequency_mhz }} MHz) — {{ getField(item, 'ram', 'price') }} ₴
                 </option>
@@ -130,18 +139,18 @@
 
             <div class="mb-2">
               <div class="flex justify-between items-center mb-1.5">
-                <label class="text-sm font-semibold text-slate-700">Видеокарта (GPU)</label>
+                <label class="text-sm font-semibold text-slate-700">{{ $t('builder.labels.gpu') }}</label>
                 <div class="flex gap-2">
                   <select v-model="filters.gpu.brand" class="px-2 py-1 border border-slate-300 rounded text-xs w-28 outline-none focus:ring-1 focus:ring-blue-500 bg-white">
-                    <option value="">Все бренды</option>
+                    <option value="">{{ $t('builder.filters.allBrands') }}</option>
                     <option v-for="brand in availableBrands.gpu" :key="brand" :value="brand">{{ brand }}</option>
                   </select>
-                  <input v-model.number="filters.gpu.minPrice" type="number" placeholder="Мин. ₴" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
-                  <input v-model.number="filters.gpu.maxPrice" type="number" placeholder="Макс. ₴" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
+                  <input v-model.number="filters.gpu.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
+                  <input v-model.number="filters.gpu.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
                 </div>
               </div>
               <select v-model="selected.gpu" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all bg-white">
-                <option :value="null">-- Выберите видеокарту --</option>
+                <option :value="null">{{ $t('builder.placeholders.selectGpu') }}</option>
                 <option v-for="item in filteredOptions.gpus" :key="item.id" :value="item">
                   {{ getField(item, 'gpu', 'name') }} — {{ getField(item, 'gpu', 'price') }} ₴
                 </option>
@@ -150,46 +159,46 @@
           </div>
 
           <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <h2 class="text-xl font-bold mb-6 border-b pb-3 text-slate-800">Шаг 3: Корпус и Питание</h2>
+            <h2 class="text-xl font-bold mb-6 border-b pb-3 text-slate-800">{{ $t('builder.step3_title') }}</h2>
             
             <div class="mb-5">
               <div class="flex justify-between items-center mb-1.5">
-                <label class="text-sm font-semibold text-slate-700">Блок питания (PSU)</label>
+                <label class="text-sm font-semibold text-slate-700">{{ $t('builder.labels.psu') }}</label>
                 <div class="flex gap-2">
                   <select v-model="filters.psu.brand" class="px-2 py-1 border border-slate-300 rounded text-xs w-28 outline-none focus:ring-1 focus:ring-blue-500 bg-white">
-                    <option value="">Все бренды</option>
+                    <option value="">{{ $t('builder.filters.allBrands') }}</option>
                     <option v-for="brand in availableBrands.psu" :key="brand" :value="brand">{{ brand }}</option>
                   </select>
-                  <input v-model.number="filters.psu.minWatt" type="number" placeholder="Мин. W" class="px-2 py-1 border border-slate-300 rounded text-xs w-16 outline-none focus:ring-1 focus:ring-blue-500">
-                  <input v-model.number="filters.psu.minPrice" type="number" placeholder="Мин. ₴" class="px-2 py-1 border border-slate-300 rounded text-xs w-16 outline-none focus:ring-1 focus:ring-blue-500">
-                  <input v-model.number="filters.psu.maxPrice" type="number" placeholder="Макс. ₴" class="px-2 py-1 border border-slate-300 rounded text-xs w-16 outline-none focus:ring-1 focus:ring-blue-500">
+                  <input v-model.number="filters.psu.minWatt" type="number" :placeholder="$t('builder.filters.minWatt')" class="px-2 py-1 border border-slate-300 rounded text-xs w-16 outline-none focus:ring-1 focus:ring-blue-500">
+                  <input v-model.number="filters.psu.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-2 py-1 border border-slate-300 rounded text-xs w-16 outline-none focus:ring-1 focus:ring-blue-500">
+                  <input v-model.number="filters.psu.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-2 py-1 border border-slate-300 rounded text-xs w-16 outline-none focus:ring-1 focus:ring-blue-500">
                 </div>
               </div>
               <select v-model="selected.psu" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all bg-white">
-                <option :value="null">-- Выберите блок питания --</option>
+                <option :value="null">{{ $t('builder.placeholders.selectPsu') }}</option>
                 <option v-for="item in filteredOptions.psus" :key="item.id" :value="item">
                   {{ getField(item, 'psu', 'name') }} ({{ item.wattage }}W) — {{ getField(item, 'psu', 'price') }} ₴
                 </option>
               </select>
               <p v-if="systemTdp > 0" class="text-xs text-blue-600 font-semibold mt-1">
-                TDP Сборки: {{ systemTdp }} Вт. Рекомендуем БП от {{ recommendedPsu }} Вт.
+                {{ $t('builder.hints.tdpHint', { tdp: systemTdp, psu: recommendedPsu }) }}
               </p>
             </div>
 
             <div class="mb-2">
               <div class="flex justify-between items-center mb-1.5">
-                <label class="text-sm font-semibold text-slate-700">Корпус (Case)</label>
+                <label class="text-sm font-semibold text-slate-700">{{ $t('builder.labels.case') }}</label>
                 <div v-if="selected.mb" class="flex gap-2">
                   <select v-model="filters.case.brand" class="px-2 py-1 border border-slate-300 rounded text-xs w-28 outline-none focus:ring-1 focus:ring-blue-500 bg-white">
-                    <option value="">Все бренды</option>
+                    <option value="">{{ $t('builder.filters.allBrands') }}</option>
                     <option v-for="brand in availableBrands.case" :key="brand" :value="brand">{{ brand }}</option>
                   </select>
-                  <input v-model.number="filters.case.minPrice" type="number" placeholder="Мин. ₴" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
-                  <input v-model.number="filters.case.maxPrice" type="number" placeholder="Макс. ₴" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
+                  <input v-model.number="filters.case.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
+                  <input v-model.number="filters.case.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-2 py-1 border border-slate-300 rounded text-xs w-20 outline-none focus:ring-1 focus:ring-blue-500">
                 </div>
               </div>
               <select v-model="selected.case" :disabled="!selected.mb" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:bg-slate-100 disabled:opacity-70 bg-white">
-                <option :value="null">{{ selected.mb ? '-- Выберите корпус --' : 'Сначала выберите материнскую плату' }}</option>
+                <option :value="null">{{ selected.mb ? $t('builder.placeholders.selectCase') : $t('builder.placeholders.needMbFirst') }}</option>
                 <option v-for="item in filteredOptions.cases" :key="item.id" :value="item">
                   {{ getField(item, 'case', 'name') }} — {{ getField(item, 'case', 'price') }} ₴
                 </option>
@@ -201,22 +210,23 @@
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-blue-200 h-fit sticky top-24">
           <h2 class="text-xl font-bold mb-4 border-b pb-2 flex items-center gap-2">
             <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-            Итоговая сборка
+            {{ $t('builder.summary_title') }}
           </h2>
           
           <ul class="space-y-4 mb-6 min-h-[150px]">
             <li v-if="!hasItemsInCart" class="text-slate-400 text-sm italic text-center mt-10">
-              Сборка пуста. Выберите комплектующие слева.
+              {{ $t('builder.summary.empty') }}
             </li>
             
             <template v-for="row in cartItems" :key="row.id">
               <li v-if="row.item" class="flex items-center gap-3 border-b pb-3 animate-[fadeIn_0.3s_ease-out] group">
                 <div class="w-12 h-12 flex-shrink-0 bg-white border rounded p-1 flex items-center justify-center">
                   <img v-if="row.img" :src="row.img" class="max-w-full max-h-full object-contain" />
-                  <span v-else class="text-[10px] text-slate-400 text-center leading-tight">Нет<br>фото</span>
+                  <span v-else class="text-[10px] text-slate-400 text-center leading-tight" v-html="$t('builder.summary.noPhoto')"></span>
                 </div>
                 
                 <div class="flex-grow pr-1">
+                  <!-- Для label компонентов лучше тоже использовать ключи перевода в JS -->
                   <span class="text-[11px] uppercase tracking-wider font-bold text-blue-500 block mb-1">{{ row.label }}</span> 
                   <span class="text-sm font-medium text-slate-700 leading-snug block">{{ row.name }}</span>
                 </div>
@@ -224,7 +234,7 @@
                 <div class="flex items-center gap-2">
                   <div class="font-bold text-slate-800 whitespace-nowrap">{{ row.price }} ₴</div>
                   
-                  <button @click="removeComponent(row.id)" class="text-slate-400 hover:text-red-500 transition-colors p-1" title="Убрать из сборки">
+                  <button @click="removeComponent(row.id)" class="text-slate-400 hover:text-red-500 transition-colors p-1" :title="$t('builder.summary.remove')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                   </button>
                 </div>
@@ -234,17 +244,17 @@
 
           <div class="border-t pt-4 bg-slate-50 p-4 rounded-xl">
             <div class="flex justify-between items-center text-xl font-black text-slate-800">
-              <span>Итого:</span>
+              <span>{{ $t('builder.summary.total') }}</span>
               <span class="text-blue-600">{{ totalPrice }} ₴</span>
             </div>
             <div class="flex justify-between items-center text-sm font-medium text-slate-500 mt-3">
-              <span>Потребление (TDP):</span>
-              <span class="text-orange-500">{{ totalTdpCalc }} Вт</span>
+              <span>{{ $t('builder.summary.tdp') }}</span>
+              <span class="text-orange-500">{{ totalTdpCalc }} W</span>
             </div>
             
             <button @click="saveBuild" class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors shadow-lg flex justify-center items-center gap-2">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-              Сохранить сборку
+              {{ $t('builder.summary.saveBtn') }}
             </button>
           </div>
         </div>
@@ -255,29 +265,29 @@
       <div v-else-if="currentView === 'profile'" class="space-y-6 animate-[fadeIn_0.3s_ease-out]">
         
         <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-          <h2 class="text-2xl font-bold mb-6 border-b pb-3 text-slate-800">Настройки профиля</h2>
+          <h2 class="text-2xl font-bold mb-6 border-b pb-3 text-slate-800">{{ $t('profile.settingsTitle') }}</h2>
           
           <form @submit.prevent="updateProfile" class="max-w-md space-y-4">
             <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">Новое имя пользователя</label>
-              <input v-model="profileForm.username" type="text" placeholder="Оставьте пустым, если не меняете" class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+              <label class="block text-sm font-semibold text-slate-700 mb-1">{{ $t('profile.newUsername') }}</label>
+              <input v-model="profileForm.username" type="text" :placeholder="$t('profile.leaveEmpty')" class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
             <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">Новый пароль</label>
-              <input v-model="profileForm.password" type="password" placeholder="Оставьте пустым, если не меняете" class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+              <label class="block text-sm font-semibold text-slate-700 mb-1">{{ $t('profile.newPassword') }}</label>
+              <input v-model="profileForm.password" type="password" :placeholder="$t('profile.leaveEmpty')" class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
             <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-6 rounded-lg transition-colors shadow-md">
-              Сохранить изменения
+              {{ $t('profile.saveChanges') }}
             </button>
-            <p class="text-xs text-slate-500 mt-2">Внимание: при смене пароля потребуется войти заново!</p>
+            <p class="text-xs text-slate-500 mt-2">{{ $t('profile.passwordWarning') }}</p>
           </form>
         </div>
 
         <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-          <h2 class="text-2xl font-bold mb-6 border-b pb-3 text-slate-800">Мои сохраненные сборки</h2>
+          <h2 class="text-2xl font-bold mb-6 border-b pb-3 text-slate-800">{{ $t('profile.buildsTitle') }}</h2>
           
           <div v-if="userBuilds.length === 0" class="text-slate-500 italic">
-            У вас пока нет сохраненных сборок.
+            {{ $t('profile.noBuilds') }}
           </div>
           
           <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -287,24 +297,24 @@
               
               <div class="flex justify-between items-start mb-3">
                 <h3 class="font-bold text-lg text-blue-600 group-hover:text-blue-700 transition-colors">{{ b.build_name }}</h3>
-                <button @click.stop="deleteBuild(b.id)" class="text-slate-400 hover:text-red-500 bg-white p-1.5 rounded-md shadow-sm border border-slate-200" title="Удалить сборку">
+                <button @click.stop="deleteBuild(b.id)" class="text-slate-400 hover:text-red-500 bg-white p-1.5 rounded-md shadow-sm border border-slate-200" :title="$t('profile.deleteHint')">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 </button>
               </div>
               
               <div class="text-sm text-slate-600 space-y-1.5">
                 <p class="flex justify-between"><strong class="text-slate-500 text-xs uppercase tracking-wider">CPU:</strong> <span class="text-right ml-2 truncate">{{ getComponentName('cpus', b.cpu_id) }}</span></p>
-                <p class="flex justify-between"><strong class="text-slate-500 text-xs uppercase tracking-wider">Плата:</strong> <span class="text-right ml-2 truncate">{{ getComponentName('mbs', b.motherboard_id) }}</span></p>
-                <p v-if="b.cooler_id" class="flex justify-between"><strong class="text-slate-500 text-xs uppercase tracking-wider">Охлад:</strong> <span class="text-right ml-2 truncate">{{ getComponentName('coolers', b.cooler_id) }}</span></p>
-                <p class="flex justify-between"><strong class="text-slate-500 text-xs uppercase tracking-wider">ОЗУ:</strong> <span class="text-right ml-2 truncate">{{ getComponentName('rams', b.ram_id) }}</span></p>
+                <p class="flex justify-between"><strong class="text-slate-500 text-xs uppercase tracking-wider">MB:</strong> <span class="text-right ml-2 truncate">{{ getComponentName('mbs', b.motherboard_id) }}</span></p>
+                <p v-if="b.cooler_id" class="flex justify-between"><strong class="text-slate-500 text-xs uppercase tracking-wider">COOL:</strong> <span class="text-right ml-2 truncate">{{ getComponentName('coolers', b.cooler_id) }}</span></p>
+                <p class="flex justify-between"><strong class="text-slate-500 text-xs uppercase tracking-wider">RAM:</strong> <span class="text-right ml-2 truncate">{{ getComponentName('rams', b.ram_id) }}</span></p>
                 <p v-if="b.gpu_id" class="flex justify-between"><strong class="text-slate-500 text-xs uppercase tracking-wider">GPU:</strong> <span class="text-right ml-2 truncate">{{ getComponentName('gpus', b.gpu_id) }}</span></p>
-                <p class="flex justify-between"><strong class="text-slate-500 text-xs uppercase tracking-wider">БП:</strong> <span class="text-right ml-2 truncate">{{ getComponentName('psus', b.psu_id) }}</span></p>
-                <p class="flex justify-between"><strong class="text-slate-500 text-xs uppercase tracking-wider">Корпус:</strong> <span class="text-right ml-2 truncate">{{ getComponentName('cases', b.case_id) }}</span></p>
+                <p class="flex justify-between"><strong class="text-slate-500 text-xs uppercase tracking-wider">PSU:</strong> <span class="text-right ml-2 truncate">{{ getComponentName('psus', b.psu_id) }}</span></p>
+                <p class="flex justify-between"><strong class="text-slate-500 text-xs uppercase tracking-wider">CASE:</strong> <span class="text-right ml-2 truncate">{{ getComponentName('cases', b.case_id) }}</span></p>
               </div>
               
               <div class="mt-4 pt-3 border-t border-slate-200 flex justify-between items-center">
-                <span class="text-[11px] font-bold text-blue-500 uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity">Открыть в конструкторе</span>
-                <span class="text-xs text-slate-400">Создана: {{ b.created_at ? new Date(b.created_at).toLocaleDateString() : 'Недавно' }}</span>
+                <span class="text-[11px] font-bold text-blue-500 uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity">{{ $t('profile.openBuilder') }}</span>
+                <span class="text-xs text-slate-400">{{ $t('profile.createdAt') }} {{ b.created_at ? new Date(b.created_at).toLocaleDateString() : $t('profile.recently') }}</span>
               </div>
             </div>
           </div>
@@ -322,36 +332,36 @@
 
         <div class="p-8">
           <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">
-            {{ isLoginMode ? 'Вход в аккаунт' : 'Регистрация' }}
+            {{ isLoginMode ? $t('auth.loginTitle') : $t('auth.registerTitle') }}
           </h2>
 
           <form @submit.prevent="submitAuth" class="space-y-4">
             <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">Имя пользователя (Логин)</label>
+              <label class="block text-sm font-semibold text-slate-700 mb-1">{{ $t('auth.username') }}</label>
               <input v-model="authForm.username" type="text" required class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
 
             <div v-if="!isLoginMode">
-              <label class="block text-sm font-semibold text-slate-700 mb-1">Email</label>
+              <label class="block text-sm font-semibold text-slate-700 mb-1">{{ $t('auth.email') }}</label>
               <input v-model="authForm.email" type="email" required class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
 
             <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">Пароль</label>
+              <label class="block text-sm font-semibold text-slate-700 mb-1">{{ $t('auth.password') }}</label>
               <input v-model="authForm.password" type="password" required class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
 
             <p v-if="authError" class="text-red-500 text-sm text-center font-medium">{{ authError }}</p>
 
             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors shadow-md mt-2">
-              {{ isLoginMode ? 'Войти' : 'Зарегистрироваться' }}
+              {{ isLoginMode ? $t('auth.loginBtn') : $t('auth.registerBtn') }}
             </button>
           </form>
 
           <div class="mt-6 text-center text-sm text-slate-500">
-            {{ isLoginMode ? 'Нет аккаунта?' : 'Уже есть аккаунт?' }}
+            {{ isLoginMode ? $t('auth.noAccount') : $t('auth.hasAccount') }}
             <button @click="toggleAuthMode" class="text-blue-600 font-bold hover:underline ml-1">
-              {{ isLoginMode ? 'Создать' : 'Войти' }}
+              {{ isLoginMode ? $t('auth.createBtn') : $t('auth.loginBtn') }}
             </button>
           </div>
         </div>
@@ -361,12 +371,20 @@
 </template>
 
 <script setup>
+
 import { reactive, computed, onMounted, watch, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const API = 'http://127.0.0.1:8000/api/v1';
 
 // --- ЗАЩИТА ПРИ ЗАГРУЗКЕ ГОТОВОЙ СБОРКИ ---
 const isRestoring = ref(false); 
+
+const {t, locale} = useI18n(); 
+const changeLanguage = (lang) => { 
+  locale.value = lang; 
+  localStorage.setItem('lang',lang);
+}
 
 // --- СОСТОЯНИЕ ДАННЫХ И КОНСТРУКТОРА ---
 const options = reactive({ cpus: [], mbs: [], coolers: [], rams: [], gpus: [], psus: [], cases: [] });
