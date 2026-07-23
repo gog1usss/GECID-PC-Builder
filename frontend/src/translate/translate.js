@@ -59,7 +59,8 @@ export const messages = {
       save: {
           titleUpdate: 'Обновление сборки', titleSave: 'Сохранение сборки', buildNameLabel: 'Название сборки', 
           buildNamePlaceholder: 'Моя супер сборка', updateCurrent: 'Обновить текущую', 
-          saveAsNew: 'Сохранить как новую', saveBtn: 'Сохранить'
+          saveAsNew: 'Сохранить как новую', saveBtn: 'Сохранить', 
+          clearBuild: 'Очистить зборку'
         },
 
       delete: { 
@@ -129,7 +130,8 @@ export const messages = {
       save: {
           titleUpdate: 'Оновлення збірки', titleSave: 'Збереження збірки', buildNameLabel: 'Назва збірки', 
           buildNamePlaceholder: 'Моя супер збірка', updateCurrent: 'Оновити поточну', 
-          saveAsNew: 'Зберегти як нову', saveBtn: 'Зберегти'
+          saveAsNew: 'Зберегти як нову', saveBtn: 'Зберегти', 
+          clearBuild: 'Очистити збірку'
         },
 
       delete: { 
@@ -199,7 +201,8 @@ export const messages = {
       save: {
           titleUpdate: 'Build update', titleSave: 'Build save', buildNameLabel: 'Build name', 
           buildNamePlaceholder: 'My Super PC', updateCurrent: 'Update current', 
-          saveAsNew: 'Save as new', saveBtn: 'Save'
+          saveAsNew: 'Save as new', saveBtn: 'Save',
+          clearBuild: 'Clear build'
         },
 
       delete: { 

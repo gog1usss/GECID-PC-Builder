@@ -251,8 +251,8 @@
             </h2>
             
             <!-- Кнопка очистки сборки -->
-            <button v-if="hasItemsInCart" @click="clearBuilder" class="text-xs font-semibold text-slate-400 hover:text-red-500 transition-colors bg-slate-100 dark:bg-[#222] px-2 py-1 rounded-md" :title="$t('builder.summary.reset')">
-              {{ $t('builder.summary.reset') }}
+            <button v-if="hasItemsInCart" @click="clearBuilder" class="text-xs font-semibold text-slate-400 hover:text-red-500 transition-colors bg-slate-100 dark:bg-[#222] px-3 py-1 rounded-md" :title="$t('builder.summary.reset')">
+              {{ $t('modals.save.clearBuild') }}
             </button>
           </div>
           
@@ -296,7 +296,7 @@
             
             <button @click="openSaveModal" class="w-full mt-6 bg-blue-600 dark:bg-orange-600 hover:bg-blue-700 dark:hover:bg-orange-500 text-white font-bold py-3 px-4 rounded-full transition-all shadow-lg dark:shadow-[0_0_15px_rgba(234,88,12,0.3)] flex justify-center items-center gap-2 uppercase tracking-wide">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-              {{ currentBuildId ? $t('builder.summary.updateBtn') : $t('builder.summary.saveBtn') }}
+              {{ currentBuildId ? $t('modals.save.saveBtn') : $t('builder.summary.saveBtn') }}
             </button>
           </div>
         </div>
