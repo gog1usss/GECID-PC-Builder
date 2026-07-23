@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import { createI18n } from 'vue-i18n'
 import App from './App.vue'
 import './style.css'
-import { messages } from './translate.js'
+import { messages } from './translate/translate.js'
 
 const i18n = createI18n({
   legacy: false, 

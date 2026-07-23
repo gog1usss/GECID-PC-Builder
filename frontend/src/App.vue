@@ -12,7 +12,7 @@
         
         <div class="flex flex-wrap items-center gap-3 sm:gap-4">
           <!-- Кнопка смены темы -->
-          <button @click="toggleTheme" class="p-2 rounded-full bg-blue-700 dark:bg-[#222] hover:bg-blue-800 dark:hover:bg-[#333] transition-colors text-white dark:text-gray-300" title="Сменить тему">
+          <button @click="toggleTheme" class="p-2 rounded-full bg-blue-700 dark:bg-[#222] hover:bg-blue-800 dark:hover:bg-[#333] transition-colors text-white dark:text-gray-300" :title="$t('header.themeBtn')">
             <svg v-if="!isDarkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
             <svg v-else class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
           </button>
@@ -49,153 +49,199 @@
     </header>
 
     <main class="container mx-auto max-w-6xl p-4 mt-6">
-      <!-- === ЭКРАН 1: КОНСТРУКТОР === -->
-      <div v-if="currentView === 'builder'" class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-[fadeIn_0.3s_ease-out]">
-        
-        <div class="lg:col-span-2 space-y-6">
-  
-  <!-- ШАГ 1: ОСНОВА СИСТЕМЫ -->
-  <div class="bg-white dark:bg-[#1e1e1e] p-6 rounded-3xl shadow-md hover:shadow-xl border border-slate-200 dark:border-[#2a2a2a] transition-all duration-300">
-    <h2 class="text-xl font-bold mb-6 border-b border-slate-100 dark:border-[#333] pb-3 text-blue-600 dark:text-orange-500 transition-colors duration-300">{{ $t('builder.step1_title') }}</h2>
+        <!-- === ЭКРАН 1: КОНСТРУКТОР === -->
+        <div v-if="currentView === 'builder'" class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-[fadeIn_0.3s_ease-out]">
+          
+          <div class="lg:col-span-2 space-y-6">
     
-    <!-- CPU -->
-    <div class="mb-6 relative">
-      <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
-        <label class="text-sm font-semibold text-slate-700 dark:text-gray-300 transition-colors duration-300">{{ $t('builder.labels.cpu') }}</label>
-        <div class="flex flex-wrap gap-2 items-center">
-          <div class="w-36 z-50">
-            <CustomSelect v-model="filters.cpu.brand" :options="getBrandOptions(availableBrands.cpu)" :placeholder="$t('builder.filters.allBrands')" :labelFunc="(item) => item.name" />
+    <!-- ШАГ 1: ОСНОВА СИСТЕМЫ -->
+    <div class="bg-white dark:bg-[#1e1e1e] p-6 rounded-3xl shadow-md hover:shadow-xl border border-slate-200 dark:border-[#2a2a2a] transition-all duration-300">
+      <h2 class="text-xl font-bold mb-6 border-b border-slate-100 dark:border-[#333] pb-3 text-blue-600 dark:text-orange-500 transition-colors duration-300">{{ $t('builder.step1_title') }}</h2>
+      
+      <!-- CPU -->
+      <div class="mb-6 relative">
+        <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
+          <label class="text-sm font-semibold text-slate-700 dark:text-gray-300 transition-colors duration-300">{{ $t('builder.labels.cpu') }}</label>
+          <div class="flex flex-wrap gap-2 items-center">
+            <div class="w-36 z-50">
+              <CustomSelect v-model="filters.cpu.brand" :options="getBrandOptions(availableBrands.cpu)" :placeholder="$t('builder.filters.allBrands')" :labelFunc="(item) => item.name" />
+            </div>
+            
+            <select v-model="filters.cpu.sort" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 cursor-pointer">
+              <option value="default">{{ $t('builder.filters.sortDefault') }}</option>
+              <option value="asc">{{ $t('builder.filters.sortAsc') }}</option>
+              <option value="desc">{{ $t('builder.filters.sortDesc') }}</option>
+            </select>
+
+            <input v-model.number="filters.cpu.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
+            <input v-model.number="filters.cpu.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
           </div>
-          <input v-model.number="filters.cpu.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
-          <input v-model.number="filters.cpu.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
+        </div>
+        <div class="z-40">
+          <CustomSelect v-model="selected.cpu" :options="filteredOptions.cpus" :placeholder="$t('builder.placeholders.selectCpu')" :labelFunc="(item) => formatOption(item, 'cpu')" />
         </div>
       </div>
-      <div class="z-40">
-        <CustomSelect v-model="selected.cpu" :options="filteredOptions.cpus" :placeholder="$t('builder.placeholders.selectCpu')" :labelFunc="(item) => formatOption(item, 'cpu')" />
+
+      <!-- MB -->
+      <div class="mb-6 relative">
+        <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
+          <label class="text-sm font-semibold text-slate-700 dark:text-gray-300 transition-colors duration-300">{{ $t('builder.labels.mb') }}</label>
+          <div class="flex flex-wrap gap-2 items-center" v-if="selected.cpu">
+            <div class="w-36 z-30">
+              <CustomSelect v-model="filters.mb.brand" :options="getBrandOptions(availableBrands.mb)" :placeholder="$t('builder.filters.allBrands')" :labelFunc="(item) => item.name" />
+            </div>
+            
+            <select v-model="filters.mb.sort" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 cursor-pointer">
+              <option value="default">{{ $t('builder.filters.sortDefault') }}</option>
+              <option value="asc">{{ $t('builder.filters.sortAsc') }}</option>
+              <option value="desc">{{ $t('builder.filters.sortDesc') }}</option>
+            </select>
+
+            <input v-model.number="filters.mb.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
+            <input v-model.number="filters.mb.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
+          </div>
+        </div>
+        <div class="z-20">
+          <CustomSelect v-model="selected.mb" :options="filteredOptions.mbs" :disabled="!selected.cpu" :placeholder="selected.cpu ? $t('builder.placeholders.selectMb') : $t('builder.placeholders.needCpuFirst')" :labelFunc="(item) => formatOption(item, 'mb')" />
+        </div>
+        <p class="text-xs text-slate-500 dark:text-gray-500 mt-2 transition-colors duration-300">{{ $t('builder.hints.mbHint') }}</p>
+      </div>
+
+      <!-- Cooler -->
+      <div class="mb-2 relative">
+        <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
+          <label class="text-sm font-semibold text-slate-700 dark:text-gray-300 transition-colors duration-300">{{ $t('builder.labels.cooler') }}</label>
+          <div class="flex flex-wrap gap-2 items-center" v-if="selected.cpu">
+            <div class="w-36 z-20">
+              <CustomSelect v-model="filters.cooler.brand" :options="getBrandOptions(availableBrands.cooler)" :placeholder="$t('builder.filters.allBrands')" :labelFunc="(item) => item.name" />
+            </div>
+            
+            <select v-model="filters.cooler.sort" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 cursor-pointer">
+              <option value="default">{{ $t('builder.filters.sortDefault') }}</option>
+              <option value="asc">{{ $t('builder.filters.sortAsc') }}</option>
+              <option value="desc">{{ $t('builder.filters.sortDesc') }}</option>
+            </select>
+
+            <input v-model.number="filters.cooler.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
+            <input v-model.number="filters.cooler.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
+          </div>
+        </div>
+        <div class="z-10">
+          <CustomSelect v-model="selected.cooler" :options="filteredOptions.coolers" :disabled="!selected.cpu" :placeholder="selected.cpu ? $t('builder.placeholders.selectCooler') : $t('builder.placeholders.needCpuFirst')" :labelFunc="(item) => formatOption(item, 'cooler')" />
+        </div>
       </div>
     </div>
 
-    <!-- MB -->
-    <div class="mb-6 relative">
-      <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
-        <label class="text-sm font-semibold text-slate-700 dark:text-gray-300 transition-colors duration-300">{{ $t('builder.labels.mb') }}</label>
-        <!-- Фильтры появляются только если выбран процессор -->
-        <div class="flex flex-wrap gap-2 items-center" v-if="selected.cpu">
-          <div class="w-36 z-30">
-            <CustomSelect v-model="filters.mb.brand" :options="getBrandOptions(availableBrands.mb)" :placeholder="$t('builder.filters.allBrands')" :labelFunc="(item) => item.name" />
+    <!-- ШАГ 2: ПАМЯТЬ И ВИДЕО -->
+    <div class="bg-white dark:bg-[#1e1e1e] p-6 rounded-3xl shadow-md hover:shadow-xl border border-slate-200 dark:border-[#2a2a2a] transition-all duration-300">
+      <h2 class="text-xl font-bold mb-6 border-b border-slate-100 dark:border-[#333] pb-3 text-blue-600 dark:text-orange-500 transition-colors duration-300">{{ $t('builder.step2_title') }}</h2>
+      
+      <!-- RAM -->
+      <div class="mb-6 relative">
+        <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
+          <label class="text-sm font-semibold text-slate-700 dark:text-gray-300 transition-colors duration-300">{{ $t('builder.labels.ram') }}</label>
+          <div class="flex flex-wrap gap-2 items-center" v-if="selected.mb">
+            <div class="w-36 z-50">
+              <CustomSelect v-model="filters.ram.brand" :options="getBrandOptions(availableBrands.ram)" :placeholder="$t('builder.filters.allBrands')" :labelFunc="(item) => item.name" />
+            </div>
+            
+            <select v-model="filters.ram.sort" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 cursor-pointer">
+              <option value="default">{{ $t('builder.filters.sortDefault') }}</option>
+              <option value="asc">{{ $t('builder.filters.sortAsc') }}</option>
+              <option value="desc">{{ $t('builder.filters.sortDesc') }}</option>
+            </select>
+
+            <input v-model.number="filters.ram.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
+            <input v-model.number="filters.ram.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
           </div>
-          <input v-model.number="filters.mb.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
-          <input v-model.number="filters.mb.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
+        </div>
+        <div class="z-40">
+          <CustomSelect v-model="selected.ram" :options="filteredOptions.rams" :disabled="!selected.mb" :placeholder="selected.mb ? $t('builder.placeholders.selectRam') : $t('builder.placeholders.needMbFirst')" :labelFunc="(item) => formatOption(item, 'ram')" />
         </div>
       </div>
-      <div class="z-20">
-        <CustomSelect v-model="selected.mb" :options="filteredOptions.mbs" :disabled="!selected.cpu" :placeholder="selected.cpu ? $t('builder.placeholders.selectMb') : $t('builder.placeholders.needCpuFirst')" :labelFunc="(item) => formatOption(item, 'mb')" />
+
+      <!-- GPU -->
+      <div class="mb-2 relative">
+        <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
+          <label class="text-sm font-semibold text-slate-700 dark:text-gray-300 transition-colors duration-300">{{ $t('builder.labels.gpu') }}</label>
+          <div class="flex flex-wrap gap-2 items-center">
+            <div class="w-36 z-30">
+              <CustomSelect v-model="filters.gpu.brand" :options="getBrandOptions(availableBrands.gpu)" :placeholder="$t('builder.filters.allBrands')" :labelFunc="(item) => item.name" />
+            </div>
+            
+            <select v-model="filters.gpu.sort" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 cursor-pointer">
+              <option value="default">{{ $t('builder.filters.sortDefault') }}</option>
+              <option value="asc">{{ $t('builder.filters.sortAsc') }}</option>
+              <option value="desc">{{ $t('builder.filters.sortDesc') }}</option>
+            </select>
+
+            <input v-model.number="filters.gpu.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
+            <input v-model.number="filters.gpu.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
+          </div>
+        </div>
+        <div class="z-20">
+          <CustomSelect v-model="selected.gpu" :options="filteredOptions.gpus" :placeholder="$t('builder.placeholders.selectGpu')" :labelFunc="(item) => formatOption(item, 'gpu')" />
+        </div>
       </div>
-      <p class="text-xs text-slate-500 dark:text-gray-500 mt-2 transition-colors duration-300">{{ $t('builder.hints.mbHint') }}</p>
     </div>
 
-    <!-- Cooler -->
-    <div class="mb-2 relative">
-      <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
-        <label class="text-sm font-semibold text-slate-700 dark:text-gray-300 transition-colors duration-300">{{ $t('builder.labels.cooler') }}</label>
-        <div class="flex flex-wrap gap-2 items-center" v-if="selected.cpu">
-          <div class="w-36 z-20">
-            <CustomSelect v-model="filters.cooler.brand" :options="getBrandOptions(availableBrands.cooler)" :placeholder="$t('builder.filters.allBrands')" :labelFunc="(item) => item.name" />
+    <!-- ШАГ 3: КОРПУС И ПИТАНИЕ -->
+    <div class="bg-white dark:bg-[#1e1e1e] p-6 rounded-3xl shadow-md hover:shadow-xl border border-slate-200 dark:border-[#2a2a2a] transition-all duration-300">
+      <h2 class="text-xl font-bold mb-6 border-b border-slate-100 dark:border-[#333] pb-3 text-blue-600 dark:text-orange-500 transition-colors duration-300">{{ $t('builder.step3_title') }}</h2>
+      
+      <!-- PSU -->
+      <div class="mb-6 relative">
+        <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
+          <label class="text-sm font-semibold text-slate-700 dark:text-gray-300 transition-colors duration-300">{{ $t('builder.labels.psu') }}</label>
+          <div class="flex flex-wrap gap-2 items-center">
+            <div class="w-36 z-50">
+              <CustomSelect v-model="filters.psu.brand" :options="getBrandOptions(availableBrands.psu)" :placeholder="$t('builder.filters.allBrands')" :labelFunc="(item) => item.name" />
+            </div>
+            
+            <select v-model="filters.psu.sort" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 cursor-pointer">
+              <option value="default">{{ $t('builder.filters.sortDefault') }}</option>
+              <option value="asc">{{ $t('builder.filters.sortAsc') }}</option>
+              <option value="desc">{{ $t('builder.filters.sortDesc') }}</option>
+            </select>
+
+            <input v-model.number="filters.psu.minWatt" type="number" :placeholder="$t('builder.filters.minW')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-20 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
+            <input v-model.number="filters.psu.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-20 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
+            <input v-model.number="filters.psu.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-20 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
           </div>
-          <input v-model.number="filters.cooler.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
-          <input v-model.number="filters.cooler.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
         </div>
+        <div class="z-40">
+          <CustomSelect v-model="selected.psu" :options="filteredOptions.psus" :placeholder="$t('builder.placeholders.selectPsu')" :labelFunc="(item) => formatOption(item, 'psu')" />
+        </div>
+        <p v-if="systemTdp > 0" class="text-xs text-blue-500 dark:text-orange-400 font-semibold mt-2 transition-colors duration-300">
+          {{ $t('builder.hints.tdpHint', { tdp: systemTdp, psu: recommendedPsu }) }}
+        </p>
       </div>
-      <div class="z-10">
-        <CustomSelect v-model="selected.cooler" :options="filteredOptions.coolers" :disabled="!selected.cpu" :placeholder="selected.cpu ? $t('builder.placeholders.selectCooler') : $t('builder.placeholders.needCpuFirst')" :labelFunc="(item) => formatOption(item, 'cooler')" />
+
+      <!-- CASE -->
+      <div class="mb-2 relative">
+        <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
+          <label class="text-sm font-semibold text-slate-700 dark:text-gray-300 transition-colors duration-300">{{ $t('builder.labels.case') }}</label>
+          <div class="flex flex-wrap gap-2 items-center" v-if="selected.mb">
+            <div class="w-36 z-30">
+              <CustomSelect v-model="filters.case.brand" :options="getBrandOptions(availableBrands.case)" :placeholder="$t('builder.filters.allBrands')" :labelFunc="(item) => item.name" />
+            </div>
+            
+            <select v-model="filters.case.sort" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 cursor-pointer">
+              <option value="default">{{ $t('builder.filters.sortDefault') }}</option>
+              <option value="asc">{{ $t('builder.filters.sortAsc') }}</option>
+              <option value="desc">{{ $t('builder.filters.sortDesc') }}</option>
+            </select>
+
+            <input v-model.number="filters.case.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
+            <input v-model.number="filters.case.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
+          </div>
+        </div>
+        <div class="z-20">
+          <CustomSelect v-model="selected.case" :options="filteredOptions.cases" :disabled="!selected.mb" :placeholder="selected.mb ? $t('builder.placeholders.selectCase') : $t('builder.placeholders.needMbFirst')" :labelFunc="(item) => formatOption(item, 'case')" />
+        </div>
       </div>
     </div>
   </div>
-
-  <!-- ШАГ 2: ПАМЯТЬ И ВИДЕО -->
-  <div class="bg-white dark:bg-[#1e1e1e] p-6 rounded-3xl shadow-md hover:shadow-xl border border-slate-200 dark:border-[#2a2a2a] transition-all duration-300">
-    <h2 class="text-xl font-bold mb-6 border-b border-slate-100 dark:border-[#333] pb-3 text-blue-600 dark:text-orange-500 transition-colors duration-300">{{ $t('builder.step2_title') }}</h2>
-    
-    <!-- RAM -->
-    <div class="mb-6 relative">
-      <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
-        <label class="text-sm font-semibold text-slate-700 dark:text-gray-300 transition-colors duration-300">{{ $t('builder.labels.ram') }}</label>
-        <div class="flex flex-wrap gap-2 items-center" v-if="selected.mb">
-          <div class="w-36 z-50">
-            <CustomSelect v-model="filters.ram.brand" :options="getBrandOptions(availableBrands.ram)" :placeholder="$t('builder.filters.allBrands')" :labelFunc="(item) => item.name" />
-          </div>
-          <input v-model.number="filters.ram.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
-          <input v-model.number="filters.ram.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
-        </div>
-      </div>
-      <div class="z-40">
-        <CustomSelect v-model="selected.ram" :options="filteredOptions.rams" :disabled="!selected.mb" :placeholder="selected.mb ? $t('builder.placeholders.selectRam') : $t('builder.placeholders.needMbFirst')" :labelFunc="(item) => formatOption(item, 'ram')" />
-      </div>
-    </div>
-
-    <!-- GPU -->
-    <div class="mb-2 relative">
-      <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
-        <label class="text-sm font-semibold text-slate-700 dark:text-gray-300 transition-colors duration-300">{{ $t('builder.labels.gpu') }}</label>
-        <div class="flex flex-wrap gap-2 items-center">
-          <div class="w-36 z-30">
-            <CustomSelect v-model="filters.gpu.brand" :options="getBrandOptions(availableBrands.gpu)" :placeholder="$t('builder.filters.allBrands')" :labelFunc="(item) => item.name" />
-          </div>
-          <input v-model.number="filters.gpu.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
-          <input v-model.number="filters.gpu.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
-        </div>
-      </div>
-      <div class="z-20">
-        <CustomSelect v-model="selected.gpu" :options="filteredOptions.gpus" :placeholder="$t('builder.placeholders.selectGpu')" :labelFunc="(item) => formatOption(item, 'gpu')" />
-      </div>
-    </div>
-  </div>
-
-  <!-- ШАГ 3: КОРПУС И ПИТАНИЕ -->
-  <div class="bg-white dark:bg-[#1e1e1e] p-6 rounded-3xl shadow-md hover:shadow-xl border border-slate-200 dark:border-[#2a2a2a] transition-all duration-300">
-    <h2 class="text-xl font-bold mb-6 border-b border-slate-100 dark:border-[#333] pb-3 text-blue-600 dark:text-orange-500 transition-colors duration-300">{{ $t('builder.step3_title') }}</h2>
-    
-    <!-- PSU -->
-    <div class="mb-6 relative">
-      <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
-        <label class="text-sm font-semibold text-slate-700 dark:text-gray-300 transition-colors duration-300">{{ $t('builder.labels.psu') }}</label>
-        <div class="flex flex-wrap gap-2 items-center">
-          <div class="w-36 z-50">
-            <CustomSelect v-model="filters.psu.brand" :options="getBrandOptions(availableBrands.psu)" :placeholder="$t('builder.filters.allBrands')" :labelFunc="(item) => item.name" />
-          </div>
-          <input v-model.number="filters.psu.minWatt" type="number" placeholder="Мин. W" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-20 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
-          <input v-model.number="filters.psu.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-20 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
-          <input v-model.number="filters.psu.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-20 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
-        </div>
-      </div>
-      <div class="z-40">
-        <CustomSelect v-model="selected.psu" :options="filteredOptions.psus" :placeholder="$t('builder.placeholders.selectPsu')" :labelFunc="(item) => formatOption(item, 'psu')" />
-      </div>
-      <p v-if="systemTdp > 0" class="text-xs text-blue-500 dark:text-orange-400 font-semibold mt-2 transition-colors duration-300">
-        {{ $t('builder.hints.tdpHint', { tdp: systemTdp, psu: recommendedPsu }) }}
-      </p>
-    </div>
-
-    <!-- CASE -->
-    <div class="mb-2 relative">
-      <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
-        <label class="text-sm font-semibold text-slate-700 dark:text-gray-300 transition-colors duration-300">{{ $t('builder.labels.case') }}</label>
-        <div class="flex flex-wrap gap-2 items-center" v-if="selected.mb">
-          <div class="w-36 z-30">
-            <CustomSelect v-model="filters.case.brand" :options="getBrandOptions(availableBrands.case)" :placeholder="$t('builder.filters.allBrands')" :labelFunc="(item) => item.name" />
-          </div>
-          <input v-model.number="filters.case.minPrice" type="number" :placeholder="$t('builder.filters.minPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
-          <input v-model.number="filters.case.maxPrice" type="number" :placeholder="$t('builder.filters.maxPrice')" class="px-3 py-2 bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#333] rounded-xl text-xs w-24 outline-none focus:border-blue-500 dark:focus:border-orange-500 text-slate-700 dark:text-gray-300 transition-colors duration-300 placeholder-slate-400 dark:placeholder-gray-600">
-        </div>
-      </div>
-      <div class="z-20">
-        <CustomSelect v-model="selected.case" :options="filteredOptions.cases" :disabled="!selected.mb" :placeholder="selected.mb ? $t('builder.placeholders.selectCase') : $t('builder.placeholders.needMbFirst')" :labelFunc="(item) => formatOption(item, 'case')" />
-      </div>
-    </div>
-  </div>
-
-</div>
-
         <!-- Итоговая сборка (Сайдбар) -->
         <div class="bg-white dark:bg-[#1a1a1a] p-6 rounded-3xl shadow-xl border border-blue-200 dark:border-orange-500/20 h-fit sticky top-24 transition-colors duration-300">
           <div class="flex justify-between items-center mb-4 border-b border-slate-100 dark:border-[#333] pb-3">
@@ -205,8 +251,8 @@
             </h2>
             
             <!-- Кнопка очистки сборки -->
-            <button v-if="hasItemsInCart" @click="clearBuilder" class="text-xs font-semibold text-slate-400 hover:text-red-500 transition-colors bg-slate-100 dark:bg-[#222] px-2 py-1 rounded-md" title="Очистить сборку">
-              Сбросить
+            <button v-if="hasItemsInCart" @click="clearBuilder" class="text-xs font-semibold text-slate-400 hover:text-red-500 transition-colors bg-slate-100 dark:bg-[#222] px-2 py-1 rounded-md" :title="$t('builder.summary.reset')">
+              {{ $t('builder.summary.reset') }}
             </button>
           </div>
           
@@ -250,7 +296,7 @@
             
             <button @click="openSaveModal" class="w-full mt-6 bg-blue-600 dark:bg-orange-600 hover:bg-blue-700 dark:hover:bg-orange-500 text-white font-bold py-3 px-4 rounded-full transition-all shadow-lg dark:shadow-[0_0_15px_rgba(234,88,12,0.3)] flex justify-center items-center gap-2 uppercase tracking-wide">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-              {{ currentBuildId ? 'Обновить сборку' : $t('builder.summary.saveBtn') }}
+              {{ currentBuildId ? $t('builder.summary.updateBtn') : $t('builder.summary.saveBtn') }}
             </button>
           </div>
         </div>
@@ -309,7 +355,7 @@
               </div>
               
               <div class="mt-5 pt-4 border-t border-slate-200 dark:border-[#333] flex justify-between items-center transition-colors duration-300">
-                <span class="text-[11px] font-bold text-blue-500 dark:text-orange-500 uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity">{{ $t('profile.openBuilder') }} (Редактировать)</span>
+                <span class="text-[11px] font-bold text-blue-500 dark:text-orange-500 uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity">{{ $t('profile.openBuilder') }} ({{ $t('profile.editBuild') }})</span>
                 <span class="text-xs text-slate-400 dark:text-gray-500">{{ b.created_at ? new Date(b.created_at).toLocaleDateString() : $t('profile.recently') }}</span>
               </div>
             </div>
@@ -371,26 +417,26 @@
 
         <div class="p-8">
           <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-6 text-center transition-colors duration-300">
-            {{ currentBuildId ? 'Обновление сборки' : 'Сохранение сборки' }}
+            {{ currentBuildId ? $t('modals.save.titleUpdate') : $t('modals.save.titleSave') }}
           </h2>
 
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2 transition-colors duration-300">Название сборки</label>
-              <input v-model="newBuildName" type="text" placeholder="Моя супер сборка" class="w-full p-3 bg-slate-50 dark:bg-[#121212] border border-slate-300 dark:border-[#333] text-slate-800 dark:text-white rounded-xl focus:border-blue-500 dark:focus:border-orange-500 outline-none transition-colors duration-300" @keyup.enter="confirmSaveBuild(false)">
+              <label class="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2 transition-colors duration-300">{{ $t('modals.save.buildNameLabel') }}</label>
+              <input v-model="newBuildName" type="text" :placeholder="$t('modals.save.buildNamePlaceholder')" class="w-full p-3 bg-slate-50 dark:bg-[#121212] border border-slate-300 dark:border-[#333] text-slate-800 dark:text-white rounded-xl focus:border-blue-500 dark:focus:border-orange-500 outline-none transition-colors duration-300" @keyup.enter="confirmSaveBuild(false)">
             </div>
 
             <div v-if="currentBuildId" class="flex flex-col gap-2 pt-2">
               <button @click="confirmSaveBuild(false)" class="w-full bg-emerald-500 dark:bg-orange-600 hover:bg-emerald-600 dark:hover:bg-orange-500 text-white font-bold py-3 px-4 rounded-full transition-all shadow-md mt-2">
-                Обновить текущую
+                {{ $t('modals.save.updateCurrent') }}
               </button>
               <button @click="confirmSaveBuild(true)" class="w-full bg-blue-100 dark:bg-[#333] text-blue-700 dark:text-gray-200 hover:bg-blue-200 dark:hover:bg-[#444] font-bold py-3 px-4 rounded-full transition-all">
-                Сохранить как новую
+                {{ $t('modals.save.saveAsNew') }}
               </button>
             </div>
             
             <button v-else @click="confirmSaveBuild(false)" class="w-full bg-blue-600 dark:bg-orange-600 hover:bg-blue-700 dark:hover:bg-orange-500 text-white font-bold py-3 px-4 rounded-full transition-all shadow-md dark:shadow-[0_0_15px_rgba(234,88,12,0.2)] mt-4">
-              Сохранить
+              {{ $t('modals.save.saveBtn') }}
             </button>
           </div>
         </div>
@@ -405,15 +451,15 @@
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
         </div>
         
-        <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Видалити збірку?</h3>
-        <p class="text-sm text-slate-500 dark:text-gray-400 mb-6">Цю дію неможливо скасувати. Ви дійсно хочете видалити конфігурацію?</p>
+        <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">{{ $t('modals.delete.title') }}</h3>
+        <p class="text-sm text-slate-500 dark:text-gray-400 mb-6">{{ $t('modals.delete.description') }}</p>
         
         <div class="flex gap-3">
           <button @click="buildToDelete = null" class="flex-1 bg-slate-100 dark:bg-[#333] hover:bg-slate-200 dark:hover:bg-[#444] text-slate-700 dark:text-gray-200 font-bold py-3 px-4 rounded-xl transition-all">
-            Скасувати
+            {{ $t('modals.delete.cancel') }}
           </button>
           <button @click="confirmDeleteBuild" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-md">
-            Видалити
+            {{ $t('modals.delete.confirm') }}
           </button>
         </div>
       </div>
@@ -486,13 +532,13 @@ const systemTdp = ref(0);
 const recommendedPsu = ref(0);
 
 const filters = reactive({
-  cpu: { brand: null, minPrice: null, maxPrice: null },
-  mb: { brand: null, minPrice: null, maxPrice: null },
-  cooler: { brand: null, minPrice: null, maxPrice: null },
-  ram: { brand: null, minPrice: null, maxPrice: null },
-  gpu: { brand: null, minPrice: null, maxPrice: null },
-  psu: { brand: null, minWatt: null, minPrice: null, maxPrice: null },
-  case: { brand: null, minPrice: null, maxPrice: null }
+  cpu: { brand: null, minPrice: null, maxPrice: null, sort: 'default' },
+  mb: { brand: null, minPrice: null, maxPrice: null, sort: 'default' },
+  cooler: { brand: null, minPrice: null, maxPrice: null, sort: 'default' },
+  ram: { brand: null, minPrice: null, maxPrice: null, sort: 'default' },
+  gpu: { brand: null, minPrice: null, maxPrice: null, sort: 'default' },
+  psu: { brand: null, minWatt: null, minPrice: null, maxPrice: null, sort: 'default' },
+  case: { brand: null, minPrice: null, maxPrice: null, sort: 'default' }
 });
 
 const auth = reactive({
@@ -843,51 +889,68 @@ const availableBrands = computed(() => {
   };
 });
 
+const applySort = (arr, category, sortType) => {
+  const sorted = [...arr]; // Делаем копию, чтобы не мутировать исходный массив Vue
+  if (sortType === 'asc') {
+    return sorted.sort((a, b) => getField(a, category, 'price') - getField(b, category, 'price'));
+  }
+  if (sortType === 'desc') {
+    return sorted.sort((a, b) => getField(b, category, 'price') - getField(a, category, 'price'));
+  }
+  return sorted;
+};
+
 const filteredOptions = computed(() => {
   return {
-    cpus: deduplicate(options.cpus, 'cpu').filter(item => {
+    cpus: applySort(deduplicate(options.cpus, 'cpu').filter(item => {
       if (filters.cpu.brand && getField(item, 'cpu', 'brand') !== filters.cpu.brand.id) return false;
       if (filters.cpu.minPrice && getField(item, 'cpu', 'price') < Number(filters.cpu.minPrice)) return false;
       if (filters.cpu.maxPrice && getField(item, 'cpu', 'price') > Number(filters.cpu.maxPrice)) return false;
       return true;
-    }),
-    mbs: deduplicate(options.mbs, 'mb').filter(item => {
+    }), 'cpu', filters.cpu.sort),
+
+    mbs: applySort(deduplicate(options.mbs, 'mb').filter(item => {
       if (filters.mb.brand && getField(item, 'mb', 'brand') !== filters.mb.brand.id) return false;
       if (filters.mb.minPrice && getField(item, 'mb', 'price') < Number(filters.mb.minPrice)) return false;
       if (filters.mb.maxPrice && getField(item, 'mb', 'price') > Number(filters.mb.maxPrice)) return false;
       return true;
-    }),
-    coolers: deduplicate(options.coolers, 'cooler').filter(item => {
+    }), 'mb', filters.mb.sort),
+
+    coolers: applySort(deduplicate(options.coolers, 'cooler').filter(item => {
       if (filters.cooler.brand && getField(item, 'cooler', 'brand') !== filters.cooler.brand.id) return false;
       if (filters.cooler.minPrice && getField(item, 'cooler', 'price') < Number(filters.cooler.minPrice)) return false;
       if (filters.cooler.maxPrice && getField(item, 'cooler', 'price') > Number(filters.cooler.maxPrice)) return false;
       return true;
-    }),
-    rams: deduplicate(options.rams, 'ram').filter(item => {
+    }), 'cooler', filters.cooler.sort),
+
+    rams: applySort(deduplicate(options.rams, 'ram').filter(item => {
       if (filters.ram.brand && getField(item, 'ram', 'brand') !== filters.ram.brand.id) return false;
       if (filters.ram.minPrice && getField(item, 'ram', 'price') < Number(filters.ram.minPrice)) return false;
       if (filters.ram.maxPrice && getField(item, 'ram', 'price') > Number(filters.ram.maxPrice)) return false;
       return true;
-    }),
-    gpus: deduplicate(options.gpus, 'gpu').filter(item => {
+    }), 'ram', filters.ram.sort),
+
+    gpus: applySort(deduplicate(options.gpus, 'gpu').filter(item => {
       if (filters.gpu.brand && getField(item, 'gpu', 'brand') !== filters.gpu.brand.id) return false;
       if (filters.gpu.minPrice && getField(item, 'gpu', 'price') < Number(filters.gpu.minPrice)) return false;
       if (filters.gpu.maxPrice && getField(item, 'gpu', 'price') > Number(filters.gpu.maxPrice)) return false;
       return true;
-    }),
-    psus: deduplicate(options.psus, 'psu').filter(item => {
+    }), 'gpu', filters.gpu.sort),
+
+    psus: applySort(deduplicate(options.psus, 'psu').filter(item => {
       if (filters.psu.brand && getField(item, 'psu', 'brand') !== filters.psu.brand.id) return false;
       if (filters.psu.minWatt && (item?.wattage || 0) < Number(filters.psu.minWatt)) return false;
       if (filters.psu.minPrice && getField(item, 'psu', 'price') < Number(filters.psu.minPrice)) return false;
       if (filters.psu.maxPrice && getField(item, 'psu', 'price') > Number(filters.psu.maxPrice)) return false;
       return true;
-    }),
-    cases: deduplicate(options.cases, 'case').filter(item => {
+    }), 'psu', filters.psu.sort),
+
+    cases: applySort(deduplicate(options.cases, 'case').filter(item => {
       if (filters.case.brand && getField(item, 'case', 'brand') !== filters.case.brand.id) return false;
       if (filters.case.minPrice && getField(item, 'case', 'price') < Number(filters.case.minPrice)) return false;
       if (filters.case.maxPrice && getField(item, 'case', 'price') > Number(filters.case.maxPrice)) return false;
       return true;
-    })
+    }), 'case', filters.case.sort)
   };
 });
 
